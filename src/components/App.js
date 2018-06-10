@@ -13,6 +13,10 @@ const { persistor, store } = createStore();
 firebase.analytics().setAnalyticsCollectionEnabled(true);
 // firebase.crash().setCrashCollectionEnabled(true);
 
+import {YellowBox} from 'react-native';
+YellowBox.ignoreWarnings(['Warning: isMounted']);
+YellowBox.ignoreWarnings(['Module RCTImageLoader requires']);
+
 export default class App extends Component<null> {
     componentWillMount() {
         this.unsubscriber = firebase.auth().onAuthStateChanged((user) => {

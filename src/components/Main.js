@@ -4,7 +4,7 @@ import * as React from 'react';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
 import styled from 'styled-components/native'
 import { connect } from 'react-redux';
-import { formatDate } from '../services/utils';
+import { formatDate, getDay, getMonthAbbr } from '../services/utils';
 import { colors } from '../constants/styleGuide';
 import firebase from 'react-native-firebase';
 import { getBuddies } from '../redux/buddies';
@@ -26,9 +26,11 @@ const mapDispatchToProps = (dispatch) => ({
 })
 
 class Main extends React.Component<MainProps> {
-    componentWillMount () {
+    componentDidMount () {
         this.props.onGetBuddies();
-        this.props.onGetMeals();
+        setTimeout(() => {
+            this.props.onGetMeals();
+        }, 1)
     }
 
     render () {
@@ -46,18 +48,28 @@ class Main extends React.Component<MainProps> {
                         <Entry>
                             {!!item.photo &&
                                 <View style={{flexDirection: 'row'}}>
-                                <Image source={{uri: item.photo}} style={{flex: 1, height: 300}}/>
+                                    <Image source={{uri: item.photo}} style={{flex: 1, height: 300}} resizeMode={'cover'}/>
                                 </View>
                             }
-                            <EntryDate>{item.date && formatDate(item.date)}</EntryDate>
-                            <Name>{item.name.toUpperCase()}</Name>
-                            <Description>{item.description}</Description>
-                            <Buddies>
-                                <BuddyIcon source={require('../assets/images/users.png')} resizeMode="contain" />
-                                {item.buddies && item.buddies.map((buddy) => buddy.name).join(', ')}
-                            </Buddies>
-                            <LocationIcon source={require('../assets/images/location.png')} resizeMode="contain" />
-                            <Buddies>{item.location}</Buddies>
+                            <Content>
+                                <Header>
+                                    <DateBlock>
+                                        <DateDay>{getDay(item.date)}</DateDay>
+                                        <DateMonth>{getMonthAbbr(item.date).toUpperCase()}</DateMonth>
+                                        <DateDivider />
+                                    </DateBlock>
+                                    <View>
+                                        <MealType>{item.type}</MealType>
+                                        <Name>{item.name.toUpperCase()}</Name>
+                                    </View>
+                                </Header>
+
+                                <Description>{item.description}</Description>
+                                <Buddies>
+                                    {item.buddies && item.buddies.map((buddy) => buddy.name).join(', ')}
+                                </Buddies>
+                                <Buddies>{item.location}</Buddies>
+                            </Content>
                         </Entry>
                     )}
                 />
@@ -78,24 +90,61 @@ const Entry = styled.View`
     borderBottomColor: ${colors.highlightBackground};
     borderBottomWidth: 1;
     padding: 5px 0;
-    margin: 0 20px;
+`;
+
+const Header = styled.View`
+    flex-direction: row;
+    margin-bottom: 7px;
+`;
+
+const DateBlock = styled.View`
+    height: 50px;
+    width: 50px;
+    margin-right: 20px;
+    border-radius: 50px;
+`;
+
+const DateDay = styled.Text`
+    font-weight: bold;
+    font-size: 14px;
+    position: absolute;
+    right: 32px;
+    top: 5px;
+`;
+
+const DateMonth = styled.Text`
+    font-weight: bold;
+    font-size: 14px;
+    position: absolute;
+    left: 18px;
+    bottom: 10px;
+`;
+
+const DateDivider = styled.View`
+    width: 2px;
+    height: 45px;
+    background-color: black;
+    position: absolute;
+    transform: rotate(35deg);
+    left: 17.5px;
+    top: 0;
+`;
+
+const MealType = styled.Text`
+    color: rgb(16, 119, 63);
+    font-size: 13px;
+    font-weight: bold;
 `;
 
 const Name = styled.Text`
     font-family: 'OpenSans-Bold';
-    color: ${colors.peach};
+    color: black;
     font-size: 16px;
 `;
 
 const Description = styled.Text`
     color: black;
-`;
-
-const EntryDate = styled.Text`
-    color: black;
-    font-family: 'OpenSans-Bold';
-    font-size: 10px;
-    opacity: 0.8;
+    margin-bottom: 20px;
 `;
 
 const Buddies = styled.Text`
@@ -110,6 +159,10 @@ const BuddyIcon = styled.Image`
 const LocationIcon = styled.Image`
     height: 16px;
     width: 18px;
+`;
+
+const Content = styled.View`
+    margin: 20px;
 `;
 
 export default connect(mapStateToProps, mapDispatchToProps)(Main)

@@ -1,7 +1,16 @@
 // @flow
 
 import * as React from 'react';
-import { Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View, DatePickerIOS, Image } from 'react-native';
+import {
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
+    DatePickerIOS,
+    Image,
+    Picker
+} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import styled from 'styled-components/native'
 import { connect } from 'react-redux';
@@ -38,7 +47,9 @@ class NewEntry extends React.Component<NewEntryProps> {
         type: 'dinner',
         notes: '',
         photo: '',
-        image: ''
+        image: '',
+        dateType: 'today',
+        locationPickerOpen: false
     };
 
     addImage () {
@@ -57,6 +68,7 @@ class NewEntry extends React.Component<NewEntryProps> {
     }
 
     addEntry () {
+        const userId = firebase.auth().currentUser && firebase.auth().currentUser._user.uid;
         const entry = {
             name: this.state.name,
             description: this.state.description,
@@ -65,7 +77,8 @@ class NewEntry extends React.Component<NewEntryProps> {
             location: this.state.location,
             type: this.state.type,
             notes: this.state.notes,
-            photo: this.state.photo
+            photo: this.state.photo,
+            userId
         };
         this.props.onCreateEntry(entry)
     }
@@ -107,6 +120,7 @@ class NewEntry extends React.Component<NewEntryProps> {
                             onChangeText={(name) => this.setState({name})}
                             value={this.state.name}
                             returnKeyType="next"
+                            placeholder={'Name of dish'}
                         />
                         <Label>Type</Label>
                         <TypeButtons>
@@ -126,13 +140,50 @@ class NewEntry extends React.Component<NewEntryProps> {
                             onChangeText={(description) => this.setState({description})}
                             value={this.state.description}
                             returnKeyType="next"
+                            placeholder={'Ingredients, instructions...'}
                         />
                         <Label>Date</Label>
-                        <DatePickerIOS
-                            date={this.state.date}
-                            mode="date"
-                            onDateChange={(date) => this.setState({date})}
-                        />
+                        <TypeButtons>
+                            <TypeButton
+                                active={'today' === this.state.dateType}
+                                onPress={() => {
+                                    this.setState({
+                                        date: new Date(),
+                                        dateType: 'today'
+                                    })
+                                }}
+                            >
+                                <TypeButtonText>Today</TypeButtonText>
+                            </TypeButton>
+                            <TypeButton
+                                active={'yesterday' === this.state.dateType}
+                                onPress={() => {
+                                    this.setState({
+                                        date: new Date(Date.now() - 86400000),
+                                        dateType: 'yesterday'
+                                    })
+                                }}
+                            >
+                                <TypeButtonText>Yesterday</TypeButtonText>
+                            </TypeButton>
+                            <TypeButton
+                                active={'custom' === this.state.dateType}
+                                onPress={() => {
+                                    this.setState({
+                                        dateType: 'custom'
+                                    })
+                                }}
+                            >
+                                <TypeButtonText>Custom</TypeButtonText>
+                            </TypeButton>
+                        </TypeButtons>
+                        {this.state.dateType === 'custom' && (
+                            <DatePickerIOS
+                                date={this.state.date}
+                                mode="date"
+                                onDateChange={(date) => this.setState({date})}
+                            />
+                        )}
                         <DinnerWithContainer>
                             <DinnerWith>Together with: </DinnerWith>
                             {this.state.buddies.map((buddy, i) => (
@@ -167,17 +218,21 @@ class NewEntry extends React.Component<NewEntryProps> {
                         </TagContainer>
 
                         <Label>Location</Label>
-                        <TypeButtons>
-                            {Object.keys(locationTypes).map(type => (
-                                <TypeButton
-                                    key={type}
-                                    active={type === this.state.location}
-                                    onPress={() => this.setState({location: type})}
-                                >
-                                    <TypeButtonText>{locationTypes[type].name}</TypeButtonText>
-                                </TypeButton>
-                            ))}
-                        </TypeButtons>
+                        <SelectButton onPress={() => this.setState({locationPickerOpen: !this.state.locationPickerOpen})}>
+                            <SelectButtonText>{this.state.location ? locationTypes[this.state.location].name : 'Select location'}</SelectButtonText>
+                        </SelectButton>
+                        {this.state.locationPickerOpen && (
+                            <SelectBox>
+                                <Picker
+                                    selectedValue={this.state.location}
+                                    style={{ height: 200, width: 300 }}
+                                    onValueChange={(itemValue) => this.setState({location: itemValue})}>
+                                    {Object.keys(locationTypes).map(type => (
+                                        <Picker.Item key={type} label={locationTypes[type].name} value={type} />
+                                    ))}
+                                </Picker>
+                            </SelectBox>
+                        )}
                         {/*<Input*/}
                             {/*onChangeText={(location) => this.setState({location})}*/}
                             {/*value={this.state.location}*/}
@@ -240,18 +295,20 @@ const Wrap = styled.View`
 
 const Input = styled.TextInput`
     height: 40px;
-    background-color: ${colors.highlightBackground};
-    border-radius: 5px;
-    margin-bottom: 20px;
+    background-color: transparent;
+    margin-bottom: 30px;
     color: black;
-    padding: 0 10px;
+    padding: 0;
+    border-bottom-width: 2px;
+    border-bottom-color: black;
+    font-size: 16px;
 `;
 
 const InputArea = styled.TextInput`
     height: 80px;
-    background-color: ${colors.highlightBackground};
+    background-color: #FAFAFA;
     border-radius: 5px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     color: black;
     padding: 10px 10px;
 `;
@@ -260,7 +317,7 @@ const Label = styled.Text`
     color: black;
     font-family: 'OpenSans-Bold';
     font-size: 12px;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 `;
 
 const DinnerWithContainer = styled.View`
@@ -311,13 +368,14 @@ const TagText = styled.Text`;
 const TypeButtons = styled.View`
     flex-direction: row;
     flex-wrap: wrap;
+    margin-bottom: 20px;
 `;
 
 const TypeButton = styled.TouchableOpacity`
-    background-color: ${colors.highlightBackground};
+    background-color: ${props => props.active ? 'rgba(16, 119, 63, 0.05)' : colors.highlightBackground};
     borderWidth: 2;
-    borderColor: ${props => props.active ? colors.peach : colors.highlightBackground};
-    border-radius: 20px;
+    borderColor: ${props => props.active ? 'rgb(16, 119, 63)' : 'transparent'};
+    border-radius: 25px;
     padding: 8px 18px;
     margin-right: 10px;
     margin-bottom: 10px;
@@ -327,6 +385,23 @@ const TypeButtonText = styled.Text`
     color: black;
     font-family: 'OpenSans-Bold';
     font-size: 12px;
+`;
+
+const SelectButton = styled.TouchableOpacity`
+    height: 40px;
+    justify-content: center;
+    border-bottom-width: 2px;
+    border-bottom-color: black;
+`;
+
+const SelectButtonText = styled.Text`
+    font-size: 16px;
+`;
+
+const SelectBox = styled.View`
+    padding-bottom: 20px;
+    border-bottom-width: 2px;
+    border-bottom-color: black;
 `;
 
 export default connect(mapStateToProps, mapDispatchToProps)(NewEntry);

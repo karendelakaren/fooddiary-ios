@@ -44,9 +44,10 @@ export default (state: FoodState = defaultState, action: Action) => {
 // action creators
 
 export const getMeals = () => (dispatch) => {
-    const userId = firebase.auth().currentUser._user.uid;
+    const userId = firebase.auth().currentUser && firebase.auth().currentUser._user.uid;
+    console.log(userId);
     let meals = [];
-    firebase.firestore().collection('meals').where('userId', '==', userId).get().then((querySnapshot) => {
+    firebase.firestore().collection('meals').where('userId', '==', userId).orderBy('date', 'DESC').get().then((querySnapshot) => {
         querySnapshot.forEach(function(doc) {
             meals.push(doc.data());
         });
