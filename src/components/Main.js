@@ -10,6 +10,7 @@ import firebase from 'react-native-firebase';
 import { getBuddies } from '../redux/buddies';
 import { getMeals } from '../redux/food';
 import { logout } from '../redux/user';
+import Hamburger from './UI/Hamburger';
 
 type MainProps = {
 
@@ -26,6 +27,17 @@ const mapDispatchToProps = (dispatch) => ({
 })
 
 class Main extends React.Component<MainProps> {
+    static navigationOptions = (props) => ({
+        headerLeft: (
+            <Hamburger openDrawer={props.navigation.openDrawer} />
+        ),
+        headerRight: (
+            <TouchableOpacity onPress={() => props.navigation.navigate('newEntry')}>
+                <Text>New entry</Text>
+            </TouchableOpacity>
+        )
+    });
+
     componentDidMount () {
         this.props.onGetBuddies();
         setTimeout(() => {

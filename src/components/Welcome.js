@@ -27,13 +27,7 @@ class Welcome extends React.Component<WelcomeProps> {
 
     componentWillMount() {
         if (this.props.loggedIn) {
-            const resetAction = StackActions.reset({
-                index: 0,
-                actions: [
-                    NavigationActions.navigate({ routeName: 'main'})
-                ]
-            });
-            this.props.navigation.dispatch(resetAction)
+            this.props.navigation.navigate('main');
         }
     }
 
