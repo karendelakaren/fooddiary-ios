@@ -18,10 +18,10 @@ const rootReducer = (state, action) => {
     if (action.type === 'LOGOUT') {
         state = {
             _persist: state['_persist'],
-        }
+        };
     }
 
-    return appReducers(state, action)
+    return appReducers(state, action);
 };
 
 // eslint-disable-next-line
@@ -35,5 +35,5 @@ export default () => {
 
     const persistor = persistStore(store);
 
-    return {persistor, store}
-}
+    return {persistor, store};
+};

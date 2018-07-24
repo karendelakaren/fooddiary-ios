@@ -1,24 +1,26 @@
 // @flow
 
 import * as React from 'react';
-import { ImageBackground, View, Dimensions } from 'react-native';
-import styled from 'styled-components/native'
+import { ImageBackground, Dimensions } from 'react-native';
+import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import Register from './Register';
-import { StackActions, NavigationActions } from 'react-navigation';
 import Button from './UI/Button';
+import type { NavigationScreenProp, NavigationState } from 'react-navigation';
+import image from '../assets/images/food.jpg';
 
 type WelcomeProps = {
-
+    loggedIn: boolean,
+    navigation: NavigationScreenProp<NavigationState>
 };
 
 const mapStateToProps = (state) => ({
     loggedIn: state.user.loggedIn
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = () => ({
 
-})
+});
 
 class Welcome extends React.Component<WelcomeProps> {
     static navigationOptions = {
@@ -34,15 +36,15 @@ class Welcome extends React.Component<WelcomeProps> {
     render () {
         const {navigation: {navigate}} = this.props;
         return (
-            <ImageBackground source={require('../assets/images/food.jpg')} style={{width: Dimensions.get('window').width, height: Dimensions.get('window').height}}>
+            <ImageBackground source={image} style={{width: Dimensions.get('window').width, height: Dimensions.get('window').height}}>
                 <Container>
                     <Title>Welcome</Title>
                     <SeeThroughBlock>
                         <SubTitle>Have an account?</SubTitle>
 
-                            <Button onPress={() => navigate('login')}>
-                                Go to login
-                            </Button>
+                        <Button onPress={() => navigate('login')}>
+                            Go to login
+                        </Button>
                     </SeeThroughBlock>
                     <SeeThroughBlock>
                         <SubTitle>Or new to food diary? Create an account so we can forever save your meals</SubTitle>
@@ -50,7 +52,7 @@ class Welcome extends React.Component<WelcomeProps> {
                     </SeeThroughBlock>
                 </Container>
             </ImageBackground>
-        )
+        );
     }
 }
 
@@ -73,4 +75,4 @@ export const SeeThroughBlock = styled.View`
     padding: 10px;
 `;
 
-export default connect(mapStateToProps, mapDispatchToProps)(Welcome)
+export default connect(mapStateToProps, mapDispatchToProps)(Welcome);

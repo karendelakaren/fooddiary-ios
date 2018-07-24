@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import styled from 'styled-components/native'
+import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import { colors } from '../constants/styleGuide';
 import { loginUser} from '../redux/user';
@@ -11,7 +11,22 @@ import Button from './UI/Button';
 import { StackActions, NavigationActions } from 'react-navigation';
 
 type LoginProps = {
+    loggedIn: boolean,
+    navigation: Object,
+    error: {
+        code: number,
+        type: string,
+        message: string
+    },
+    onLoginUser: (email: string, password: string) => void
+};
 
+type LoginState = {
+    email: string,
+    password: string,
+    errorMessageEmail: string,
+    errorMessagePassword: string,
+    errorMessage: string
 };
 
 const mapStateToProps = (state) => ({
@@ -23,7 +38,7 @@ const mapDispatchToProps = (dispatch) => ({
     onLoginUser: (email, password) => dispatch(loginUser(email, password))
 });
 
-class Login extends React.Component<LoginProps> {
+class Login extends React.Component<LoginProps, LoginState> {
     static navigationOptions = {
         title: 'Login',
     };
@@ -44,22 +59,22 @@ class Login extends React.Component<LoginProps> {
                     NavigationActions.navigate({ routeName: 'main'})
                 ]
             });
-            this.props.navigation.dispatch(resetAction)
+            this.props.navigation.dispatch(resetAction);
         }
 
         if (newProps.error && (!this.props.error || newProps.error.code !== this.props.error.code)) {
             if (newProps.error.type === 'email') {
-                this.setState({errorMessageEmail: newProps.error.message})
+                this.setState({errorMessageEmail: newProps.error.message});
             } else if (newProps.error.type === 'password') {
-                this.setState({ errorMessagePassword: newProps.error.message})
+                this.setState({ errorMessagePassword: newProps.error.message});
             } else {
-                this.setState({errorMessage: newProps.error.message})
+                this.setState({errorMessage: newProps.error.message});
             }
         }
     }
 
     login() {
-        this.props.onLoginUser(this.state.email, this.state.password)
+        this.props.onLoginUser(this.state.email, this.state.password);
     }
 
     render () {
@@ -80,7 +95,7 @@ class Login extends React.Component<LoginProps> {
                             if (!this.state.email) {
                                 this.setState({
                                     errorMessageEmail: ERROR_EMPTY_EMAIL
-                                })
+                                });
                             }
                         }}
                     />
@@ -112,7 +127,7 @@ class Login extends React.Component<LoginProps> {
                 <InputError>{this.state.errorMessage}</InputError>
                 }
             </Container>
-        )
+        );
     }
 }
 
@@ -121,4 +136,4 @@ const Container = styled.View`
     background-color: ${colors.background};
 `;
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login)
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

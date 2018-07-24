@@ -1,13 +1,10 @@
 // @flow
-import React from 'react';
-import { createStackNavigator, createDrawerNavigator, createSwitchNavigator } from 'react-navigation'
-import styled from 'styled-components/native'
+import { createStackNavigator, createDrawerNavigator, createSwitchNavigator } from 'react-navigation';
 import Main from './Main';
 import NewEntry from './NewEntry';
 import Login from './Login';
 import Welcome from './Welcome';
 import PasswordReset from './PasswordReset';
-import { Image, Text, View, TouchableOpacity } from 'react-native';
 
 const FeedNavigator = createStackNavigator({
     list: {
@@ -41,4 +38,4 @@ const RootNavigator = createSwitchNavigator({
     main: {screen: MainNavigator}
 });
 
-export default RootNavigator
+export default RootNavigator;

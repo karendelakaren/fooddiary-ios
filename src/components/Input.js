@@ -1,5 +1,4 @@
-import styled from 'styled-components/native'
-import { colors } from '../constants/styleGuide';
+import styled from 'styled-components/native';
 
 export const Input = styled.TextInput`
     height: 25px;

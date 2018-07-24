@@ -1,10 +1,10 @@
 // @flow
 
-import React, { Component } from 'react'
-import { Text } from 'react-native'
-import createStore from '../createStore'
-import { Provider } from 'react-redux'
-import { PersistGate } from 'redux-persist/es/integration/react'
+import React, { Component } from 'react';
+import { Text } from 'react-native';
+import createStore from '../createStore';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/es/integration/react';
 import RootNavigator from './AppNavigation';
 import firebase from 'react-native-firebase';
 
@@ -18,9 +18,11 @@ YellowBox.ignoreWarnings(['Warning: isMounted']);
 YellowBox.ignoreWarnings(['Module RCTImageLoader requires']);
 
 export default class App extends Component<null> {
-    componentWillMount() {
+    unsubscriber: ?Function;
+
+    componentDidMount() {
         this.unsubscriber = firebase.auth().onAuthStateChanged((user) => {
-            console.log(user)
+            console.log(user);
         });
     }
     render () {
@@ -33,6 +35,6 @@ export default class App extends Component<null> {
                     <RootNavigator />
                 </PersistGate>
             </Provider>
-        )
+        );
     }
 }

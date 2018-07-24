@@ -2,18 +2,22 @@
 
 import * as React from 'react';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
-import styled from 'styled-components/native'
+import styled from 'styled-components/native';
 import { connect } from 'react-redux';
-import { formatDate, getDay, getMonthAbbr } from '../services/utils';
+import { getDay, getMonthAbbr } from '../services/utils';
 import { colors } from '../constants/styleGuide';
-import firebase from 'react-native-firebase';
 import { getBuddies } from '../redux/buddies';
 import { getMeals } from '../redux/food';
 import { logout } from '../redux/user';
 import Hamburger from './UI/Hamburger';
+import type { NavigationScreenProp, NavigationState } from 'react-navigation';
 
 type MainProps = {
-
+    onGetBuddies: () => void,
+    onGetMeals: () => void,
+    onLogout: () => void,
+    navigation: NavigationScreenProp<NavigationState>,
+    entries: Array<Object>
 };
 
 const mapStateToProps = (state) => ({
@@ -24,7 +28,7 @@ const mapDispatchToProps = (dispatch) => ({
     onGetBuddies: () => dispatch(getBuddies()),
     onGetMeals: () => dispatch(getMeals()),
     onLogout: () => dispatch(logout())
-})
+});
 
 class Main extends React.Component<MainProps> {
     static navigationOptions = (props) => ({
@@ -42,7 +46,7 @@ class Main extends React.Component<MainProps> {
         this.props.onGetBuddies();
         setTimeout(() => {
             this.props.onGetMeals();
-        }, 1)
+        }, 1);
     }
 
     render () {
@@ -89,7 +93,7 @@ class Main extends React.Component<MainProps> {
                     <Text>Logout</Text>
                 </TouchableOpacity>
             </Container>
-        )
+        );
     }
 }
 
@@ -163,18 +167,8 @@ const Buddies = styled.Text`
     color: black;
 `;
 
-const BuddyIcon = styled.Image`
-    height: 14px;
-    width: 18px;
-`;
-
-const LocationIcon = styled.Image`
-    height: 16px;
-    width: 18px;
-`;
-
 const Content = styled.View`
     margin: 20px;
 `;
 
-export default connect(mapStateToProps, mapDispatchToProps)(Main)
+export default connect(mapStateToProps, mapDispatchToProps)(Main);

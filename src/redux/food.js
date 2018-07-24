@@ -24,22 +24,22 @@ export type Action =
 
 export default (state: FoodState = defaultState, action: Action) => {
     switch (action.type) {
-        case 'GET_MEALS': {
-            return {
-                ...state,
-                entries: [...action.payload]
-            }
-        }
-        case 'ADD_ENTRY': {
-            return {
-                ...state,
-                entries: [action.payload ,...state.entries]
-            }
-        }
-        default:
-            return state
+    case 'GET_MEALS': {
+        return {
+            ...state,
+            entries: [...action.payload]
+        };
     }
-}
+    case 'ADD_ENTRY': {
+        return {
+            ...state,
+            entries: [action.payload ,...state.entries]
+        };
+    }
+    default:
+        return state;
+    }
+};
 
 // action creators
 
@@ -51,11 +51,11 @@ export const getMeals = () => (dispatch) => {
         querySnapshot.forEach(function(doc) {
             meals.push(doc.data());
         });
-        dispatch({type: 'GET_MEALS', payload: meals})
+        dispatch({type: 'GET_MEALS', payload: meals});
     })
         .catch(error => {
             console.log(error);
-        })
+        });
 };
 
 export const createNewEntry = (entry: Object) => (dispatch) => {
@@ -67,5 +67,5 @@ export const createNewEntry = (entry: Object) => (dispatch) => {
                 ...entry
             }
         });
-    })
+    });
 };

@@ -1,7 +1,8 @@
 // @flow
 
 import React from 'react';
-import styled from 'styled-components/native'
+import styled from 'styled-components/native';
+import hamburger from '../../assets/images/hamburger.png';
 
 type HamburgerProps = {
     openDrawer: () => void
@@ -9,7 +10,7 @@ type HamburgerProps = {
 
 const Hamburger = (props: HamburgerProps) => (
     <Button onPress={props.openDrawer}>
-        <Icon source={require('../../assets/images/hamburger.png')} resizeMode="contain" />
+        <Icon source={hamburger} resizeMode="contain" />
     </Button>
 );
 

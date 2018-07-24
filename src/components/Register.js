@@ -1,18 +1,25 @@
 // @flow
 
 import * as React from 'react';
-import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
-import styled from 'styled-components/native'
 import { connect } from 'react-redux';
-import { colors } from '../constants/styleGuide';
 import { registerUser } from '../redux/user';
-import { StackActions, NavigationActions } from 'react-navigation'
-import { SeeThroughBlock } from './Welcome';
+import { StackActions, NavigationActions, type NavigationState, type NavigationScreenProp } from 'react-navigation';
 import Button from './UI/Button';
 import { Input, InputError, InputWrap, Label } from './Input';
 
 type RegisterProps = {
+    loggedIn: boolean,
+    navigation: NavigationScreenProp<NavigationState>,
+    onRegisterUser: (email: string, password: string) => void
+};
 
+type RegisterState = {
+    email: string,
+    password: string,
+    password2: string,
+    errorMessageEmail: string,
+    errorMessagePassword: string,
+    errorMessage: string
 };
 
 const mapStateToProps = (state) => ({
@@ -26,9 +33,9 @@ const mapDispatchToProps = (dispatch) => ({
 
 const ERROR_PASSWORDS_DONT_MATCH = 'Oops, looks like these are not the same passwords';
 export const ERROR_EMPTY_EMAIL = 'Oops, looks like you forgot to fill in your email address';
-const ERROR_EMPTY_PASSWORD = 'A diary without a password is like a tomato soup without tomato. Please fill in your password'
+const ERROR_EMPTY_PASSWORD = 'A diary without a password is like a tomato soup without tomato. Please fill in your password';
 
-    class Register extends React.Component<RegisterProps> {
+class Register extends React.Component<RegisterProps, RegisterState> {
     state = {
         email: '',
         password: '',
@@ -46,32 +53,32 @@ const ERROR_EMPTY_PASSWORD = 'A diary without a password is like a tomato soup w
                     NavigationActions.navigate({ routeName: 'main'})
                 ]
             });
-            this.props.navigation.dispatch(resetAction)
+            this.props.navigation.dispatch(resetAction);
         }
 
         if (newProps.error && (!this.props.error || newProps.error.code !== this.props.error.code)) {
             if (newProps.error.type === 'email') {
-                this.setState({errorMessageEmail: newProps.error.message})
+                this.setState({errorMessageEmail: newProps.error.message});
             } else if (newProps.error.type === 'password') {
-                this.setState({ errorMessagePassword: newProps.error.message})
+                this.setState({ errorMessagePassword: newProps.error.message});
             } else {
-                this.setState({errorMessage: newProps.error.message})
+                this.setState({errorMessage: newProps.error.message});
             }
         }
     }
 
     register() {
         if (!this.state.email) {
-            this.setState({errorMessageEmail: ERROR_EMPTY_EMAIL })
+            this.setState({errorMessageEmail: ERROR_EMPTY_EMAIL });
         }
         if (!this.state.password) {
-            this.setState({errorMessagePassword: ERROR_EMPTY_PASSWORD})
+            this.setState({errorMessagePassword: ERROR_EMPTY_PASSWORD});
         } else if (this.state.password !== this.state.password2) {
-            this.setState({errorMessagePassword: ERROR_PASSWORDS_DONT_MATCH})
+            this.setState({errorMessagePassword: ERROR_PASSWORDS_DONT_MATCH});
         } else if (this.state.email) {
-            console.log('reached it')
-            this.setState({errorMessageEmail: '', errorMessagePassword: ''})
-            this.props.onRegisterUser(this.state.email, this.state.password)
+            console.log('reached it');
+            this.setState({errorMessageEmail: '', errorMessagePassword: ''});
+            this.props.onRegisterUser(this.state.email, this.state.password);
         }
     }
 
@@ -93,7 +100,7 @@ const ERROR_EMPTY_PASSWORD = 'A diary without a password is like a tomato soup w
                             if (!this.state.email) {
                                 this.setState({
                                     errorMessageEmail: ERROR_EMPTY_EMAIL
-                                })
+                                });
                             }
                         }}
                     />
@@ -114,9 +121,9 @@ const ERROR_EMPTY_PASSWORD = 'A diary without a password is like a tomato soup w
                         onChangeText={(text) => this.setState({password: text})}
                         onBlur={()=> {
                             if (this.state.password2 && this.state.password !== this.state.password2) {
-                                this.setState({errorMessagePassword: ERROR_PASSWORDS_DONT_MATCH})
+                                this.setState({errorMessagePassword: ERROR_PASSWORDS_DONT_MATCH});
                             } else {
-                                this.setState({errorMessagePassword: ''})
+                                this.setState({errorMessagePassword: ''});
                             }
                         }}
                     />
@@ -134,9 +141,9 @@ const ERROR_EMPTY_PASSWORD = 'A diary without a password is like a tomato soup w
                         onChangeText={(text) => this.setState({password2: text})}
                         onBlur={()=> {
                             if (this.state.password !== this.state.password2) {
-                                this.setState({errorMessagePassword: ERROR_PASSWORDS_DONT_MATCH})
+                                this.setState({errorMessagePassword: ERROR_PASSWORDS_DONT_MATCH});
                             } else {
-                                this.setState({errorMessagePassword: ''})
+                                this.setState({errorMessagePassword: ''});
                             }
                         }}
                     />
@@ -151,8 +158,8 @@ const ERROR_EMPTY_PASSWORD = 'A diary without a password is like a tomato soup w
                 <InputError>{this.state.errorMessage}</InputError>
                 }
             </View>
-        )
+        );
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Register)
+export default connect(mapStateToProps, mapDispatchToProps)(Register);

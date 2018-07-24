@@ -16,7 +16,8 @@ export type BuddiesState = {
 const defaultState: BuddiesState = [];
 
 export type Action =
-    {type: 'ADD_BUDDY', payload: Object}
+    {type: 'ADD_BUDDY', payload: Object} |
+    {type: 'GET_BUDDIES', payload: Object}
 
 // actions
 
@@ -24,27 +25,27 @@ export type Action =
 
 export default (state: BuddiesState = defaultState, action: Action) => {
     switch (action.type) {
-        case 'GET_BUDDIES': {
-            return {
-                ...state,
-                buddies: action.payload
-            }
-        }
-        case 'ADD_BUDDY': {
-            return {
-                ...state,
-                buddies: {
-                    ...action.payload,
-                    ...state.buddies
-                }
-
-
-            }
-        }
-        default:
-            return state
+    case 'GET_BUDDIES': {
+        return {
+            ...state,
+            buddies: action.payload
+        };
     }
-}
+    case 'ADD_BUDDY': {
+        return {
+            ...state,
+            buddies: {
+                ...action.payload,
+                ...state.buddies
+            }
+
+
+        };
+    }
+    default:
+        return state;
+    }
+};
 
 // action creators
 
@@ -54,8 +55,8 @@ export const getBuddies = () => (dispatch) => {
         querySnapshot.forEach(function(doc) {
             buddies[doc.id] = doc.data();
         });
-        dispatch({type: 'GET_BUDDIES', payload: buddies})
-    })
+        dispatch({type: 'GET_BUDDIES', payload: buddies});
+    });
 };
 
 export const addBuddy = (buddy: string) => (dispatch) => {
@@ -70,5 +71,5 @@ export const addBuddy = (buddy: string) => (dispatch) => {
                 }
             }
         });
-    })
+    });
 };

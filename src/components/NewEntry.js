@@ -3,16 +3,14 @@
 import * as React from 'react';
 import {
     Text,
-    TextInput,
     TouchableOpacity,
-    TouchableWithoutFeedback,
     View,
     DatePickerIOS,
     Image,
     Picker
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import styled from 'styled-components/native'
+import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import { createNewEntry } from '../redux/food';
 import { addBuddy } from '../redux/buddies';
@@ -23,8 +21,24 @@ import ImagePicker from 'react-native-image-picker';
 import firebase from 'react-native-firebase';
 
 type NewEntryProps = {
-
+    onCreateEntry: (entry: Object) => void
 };
+
+type NewEntryState = {
+    name: string,
+    description: string,
+    date: Date,
+    buddy: string,
+    buddies: Array,
+    location: string,
+    website: string,
+    type: string,
+    notes: string,
+    photo: string,
+    image: string,
+    dateType: string,
+    locationPickerOpen: boolean
+}
 
 const mapStateToProps = (state) => ({
     buddies: state.buddies.buddies
@@ -35,7 +49,7 @@ const mapDispatchToProps = (dispatch) => ({
     onAddBuddy: (buddy) => dispatch(addBuddy(buddy))
 });
 
-class NewEntry extends React.Component<NewEntryProps> {
+class NewEntry extends React.Component<NewEntryProps, NewEntryState> {
     state = {
         name: '',
         description: '',
@@ -54,16 +68,18 @@ class NewEntry extends React.Component<NewEntryProps> {
 
     addImage () {
         ImagePicker.launchImageLibrary({}, (imageResponse)  => {
-            this.setState({image: imageResponse.uri})
+            console.log(imageResponse);
+            if (imageResponse.didCancel) { return false; }
+            this.setState({image: imageResponse.uri});
             firebase.storage().ref(imageResponse.fileName).putFile(imageResponse.uri, {
                 contentType: 'image/jpeg',
                 timeCreated: imageResponse.timestamp
             })
                 .then(response => {
-                    this.setState({photo: response.downloadURL})
+                    this.setState({photo: response.downloadURL});
                 }).catch(error => {
-                console.log(error)
-            })
+                    console.log(error);
+                });
         });
     }
 
@@ -80,7 +96,7 @@ class NewEntry extends React.Component<NewEntryProps> {
             photo: this.state.photo,
             userId
         };
-        this.props.onCreateEntry(entry)
+        this.props.onCreateEntry(entry);
     }
 
     addBuddy () {
@@ -97,7 +113,7 @@ class NewEntry extends React.Component<NewEntryProps> {
 
         const url = this.state.website;
         fetch(url).then((reponse) => {
-            return reponse.text()
+            return reponse.text();
         }).then(body => {
             const matchSiteName = body.match(/<meta.name="application-name".*content="(.*)".*\/>/);
             console.log(matchSiteName);
@@ -109,8 +125,7 @@ class NewEntry extends React.Component<NewEntryProps> {
     }
 
     render () {
-        const {navigation: {navigate}} = this.props;
-        console.log(this.state.photo, this.state.image)
+        console.log(this.state.photo, this.state.image);
         return (
             <Container>
                 <KeyboardAwareScrollView keyboardDismissMode="interactive">
@@ -150,7 +165,7 @@ class NewEntry extends React.Component<NewEntryProps> {
                                     this.setState({
                                         date: new Date(),
                                         dateType: 'today'
-                                    })
+                                    });
                                 }}
                             >
                                 <TypeButtonText>Today</TypeButtonText>
@@ -161,7 +176,7 @@ class NewEntry extends React.Component<NewEntryProps> {
                                     this.setState({
                                         date: new Date(Date.now() - 86400000),
                                         dateType: 'yesterday'
-                                    })
+                                    });
                                 }}
                             >
                                 <TypeButtonText>Yesterday</TypeButtonText>
@@ -171,7 +186,7 @@ class NewEntry extends React.Component<NewEntryProps> {
                                 onPress={() => {
                                     this.setState({
                                         dateType: 'custom'
-                                    })
+                                    });
                                 }}
                             >
                                 <TypeButtonText>Custom</TypeButtonText>
@@ -198,10 +213,10 @@ class NewEntry extends React.Component<NewEntryProps> {
                             ))}
                         </DinnerWithContainer>
                         <View>
-                        <Input
-                            onChangeText={(buddy) => this.setState({buddy})}
-                            value={this.state.buddy}
-                        />
+                            <Input
+                                onChangeText={(buddy) => this.setState({buddy})}
+                                value={this.state.buddy}
+                            />
                             <AddBuddyButton onPress={() => this.addBuddy()}>
                                 <AddBuddyButtonText>
                                     +
@@ -210,11 +225,11 @@ class NewEntry extends React.Component<NewEntryProps> {
                         </View>
 
                         <TagContainer>
-                        {Object.keys(this.props.buddies).map((buddyKey, i) => (
-                            <Tag key={i} onPress={() => this.setState({buddies: [...this.state.buddies, buddyKey]})}>
-                                <TagText >{this.props.buddies[buddyKey].name}</TagText>
-                            </Tag>
-                        ))}
+                            {Object.keys(this.props.buddies).map((buddyKey, i) => (
+                                <Tag key={i} onPress={() => this.setState({buddies: [...this.state.buddies, buddyKey]})}>
+                                    <TagText >{this.props.buddies[buddyKey].name}</TagText>
+                                </Tag>
+                            ))}
                         </TagContainer>
 
                         <Label>Location</Label>
@@ -234,24 +249,24 @@ class NewEntry extends React.Component<NewEntryProps> {
                             </SelectBox>
                         )}
                         {/*<Input*/}
-                            {/*onChangeText={(location) => this.setState({location})}*/}
-                            {/*value={this.state.location}*/}
-                            {/*returnKeyType="next"*/}
+                        {/*onChangeText={(location) => this.setState({location})}*/}
+                        {/*value={this.state.location}*/}
+                        {/*returnKeyType="next"*/}
                         {/*/>*/}
                         {/*<Label>Source</Label>*/}
                         {/*<Input*/}
-                            {/*onChangeText={(source) => this.setState({source})}*/}
-                            {/*value={this.state.source}*/}
+                        {/*onChangeText={(source) => this.setState({source})}*/}
+                        {/*value={this.state.source}*/}
                         {/*/>*/}
 
                         {/*<Input*/}
-                            {/*onChangeText={(website) => this.setState({website})}*/}
-                            {/*value={this.state.website}*/}
+                        {/*onChangeText={(website) => this.setState({website})}*/}
+                        {/*value={this.state.website}*/}
                         {/*/>*/}
                         {/*<TouchableOpacity onPress={() => this.fetchWebsite()}>*/}
-                            {/*<Text>*/}
-                                {/*Website*/}
-                            {/*</Text>*/}
+                        {/*<Text>*/}
+                        {/*Website*/}
+                        {/*</Text>*/}
                         {/*</TouchableOpacity>*/}
 
                         <Label>Notes</Label>
@@ -280,7 +295,7 @@ class NewEntry extends React.Component<NewEntryProps> {
                     </Wrap>
                 </KeyboardAwareScrollView>
             </Container>
-        )
+        );
     }
 }
 

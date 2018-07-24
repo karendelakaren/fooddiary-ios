@@ -1,9 +1,12 @@
 // @flow
 
-import React from 'react';
-import styled from 'styled-components/native'
+import React, { type Node } from 'react';
+import styled from 'styled-components/native';
 
-type ButtonProps = {};
+type ButtonProps = {
+    onPress: () => void,
+    children: Node
+};
 
 const Button = (props: ButtonProps) => (
     <ButtonWrap>
